@@ -4,7 +4,7 @@ import js.html.HashChangeEvent;
 
 class Routly {
 
-	var mappings : Map<String, ?RouteDescriptor -> Void>;
+	var mappings : Map<String, ?RouteDescriptor = null -> Void>;
 	var emitter : IRouteEmitter;
 
 	public function new(?_emitter : IRouteEmitter) {
@@ -98,6 +98,7 @@ class Routly {
 			}
 		}
 
+		// the raw path does NOT match the given virtual path
 		return null;
 	}
 
@@ -109,11 +110,9 @@ class Routly {
 			throw "invalid arrays passed to buildDescriptor.  must be non-null and equal length.";
 
 		var arguments = new Array<String>();
-		for(i in 0...raw.length) {
-			if (virtual[i].charAt(0) == ":") {
+		for(i in 0...raw.length) 
+			if (virtual[i].charAt(0) == ":") 
 				arguments.push(raw[i]);
-			}
-		}
 
 		return arguments;
 	}
