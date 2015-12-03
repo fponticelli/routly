@@ -4,26 +4,26 @@ import js.html.HashChangeEvent;
 
 class Routly {
 
-	var mappings : Map<String, ?RouteDescriptor = null -> Void>;
+	var mappings : Map<String, ?RouteDescriptor -> Void>;
 	var emitter : IRouteEmitter;
 
-	public function new(?_emitter : IRouteEmitter) {
+	public function new(?emitter : IRouteEmitter) {
 		
 		// if no IRouteEmitter is passed in, we default to using
 		// an HtmlRouteEmitter, which simply wraps window.onhashchange
-		if (_emitter == null) 
-			_emitter = new HtmlRouteEmitter();
+		if (emitter == null) 
+			emitter = new HtmlRouteEmitter();
 
 		// keep track of our emitter
-		emitter = _emitter;
+		this.emitter = emitter;
 	}
 
-	public function routes(_mappings : Map<String, ?RouteDescriptor -> Void>) {
+	public function routes(mappings : Map<String, ?RouteDescriptor -> Void>) {
 		if (mappings == null) 
 			mappings = new Map<String, ?RouteDescriptor -> Void>();
 
 		// assign the passed-in map to private var
-		mappings = _mappings;
+		this.mappings = mappings;
 	}
 
 	public function fire(path : String) {

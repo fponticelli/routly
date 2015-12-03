@@ -5,12 +5,18 @@ class TestHtml {
 
 	public function testBasePath() {
 
-		var router = new Routely(/* new HtmlRouteEmitter() is implicit */);
+		var emitter = new TestRouteEmitter();
+		var router = new Routly(emitter);
 
-		router.map([
-		  "/" => function(/* path : RouteDescriptor */) {
+		router.routes([
+		  "/" => function(?_) {
 		  	Assert.isTrue(true);
 		  }	
 		]);
+
+		router.listen(false);
+
+		emitter.emit("/");
+
 	}
 }
