@@ -30,17 +30,16 @@ class Routly {
 		
 		// if route does not exist, 
 		// maybe display a 404 view?
-		var match = findMatch(path);
-		if (match == null) {
-			// call some "unknown/bad path" callback
+		var descriptor = findMatch(path);
+		if (descriptor == null) {
+			// TODO: call some "unknown/bad path" callback:
+			// callback404(new Descriptor404(path))
 			return;
 		}
 
-		// build a description of the raw path that we have matched
-		var descriptor = parse(path);
-
-		// invoke the callback associated with the matched route
-		mappings.get(match)(descriptor);
+		// invoke the callback associated with the descriptor of hte matched route
+		var key = descriptor.virtual;
+		mappings.get(key)(descriptor);
 	}
 
 	public function listen(fireEventForCurrentPath = true) {
@@ -54,20 +53,23 @@ class Routly {
 			emitter.emit();
 	}
 
-	private function findMatch(path : String) : String {
+	private function findMatch(path : String) : RouteDescriptor {
 
 		// check each registered route for a match against 
 		// the raw path, return the matching key if one is found
 		for(virtualPath in mappings.keys()) {
-			if (matches(path, virtualPath)) {
-				return virtualPath;
-			}
+
+			// SHOULD THE matches METHOD INSTEAD TAKE 2 ARRAYS?
+			// THIS WAY WE DON'T SPLIT THE RAW PATH OVER AND OVER 
+			var descriptor = matches(path, virtualPath);
+			if (descriptor != null) 
+				return descriptor;
 		}
 
 		return null;
 	}
 
-	private function matches (rawPath : String, virtualPath : String) : Bool {
+	private function matches (rawPath : String, virtualPath : String) : RouteDescriptor {
 
 		// compare the raw route with the parameterized route
 		// "/test/:id" becomes ["test", ":id"]
@@ -81,7 +83,7 @@ class Routly {
 			throw "bad path, where are the slashes?! : " + rawPath;
 
 		// simple check against lengths, which must be equal to match
-		if (routeSplit.length != rawSplit.length) return false;
+		if (routeSplit.length != rawSplit.length) return null;
 
 		// since the lengths match, we now must walk the path and check that 
 		// each part is equal OR the raw part begins with a colon
@@ -91,18 +93,29 @@ class Routly {
 
 			// if this is the last part of the path, we've found a match!
 			if (i == routeSplit.length - 1) {
-				return true;
+				var arguments = parseArguments(rawSplit, routeSplit);
+				return new RouteDescriptor(rawPath, virtualPath, arguments);
 			}
 		}
 
-		return false;
+		return null;
 	}
 
-	private function parse(path : String) : RouteDescriptor {
-		var descriptor = new RouteDescriptor(path);
-		descriptor.path = path;
-		descriptor.arguments = null;
-		return descriptor;
+	// takes in the split virtual and raw paths and returns an array of IDs
+	// i.e., raw path /test/123/foo/456/bar/789 will return ["123", "456", "789"]
+	private function parseArguments(raw : Array<String>, virtual : Array<String>) : Array<String> {
+
+		if (raw == null || virtual == null || raw.length != virtual.length)
+			throw "invalid arrays passed to buildDescriptor.  must be non-null and equal length.";
+
+		var arguments = new Array<String>();
+		for(i in 0...raw.length) {
+			if (virtual[i].charAt(0) == ":") {
+				arguments.push(raw[i]);
+			}
+		}
+
+		return arguments;
 	}
 }
 

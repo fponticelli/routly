@@ -11,7 +11,6 @@ class TestRouteEmitter implements IRouteEmitter {
       path = "/";
     }
 
-    trace("subscribers length: " + subscribers.length);
     for(subscriber in subscribers) {
       subscriber.fire(path);
     }

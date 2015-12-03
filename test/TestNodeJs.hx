@@ -3,6 +3,19 @@ import utest.Assert;
 class TestNodeJs {
 	public function new () {}
 
+	public function testBasePathWithInitialFire() {
+		var emitter = new TestRouteEmitter();
+		var router = new Routly(emitter);
+
+		router.routes([
+		  "/" => function(?descriptor : RouteDescriptor) {
+		  	Assert.isTrue(true);
+		  }	
+		]);
+
+		router.listen();
+	}
+
 	public function testBasePathWithoutInitialFire() {
 		var emitter = new TestRouteEmitter();
 		var router = new Routly(emitter);
@@ -20,19 +33,6 @@ class TestNodeJs {
 
 		// force our emitter to emit
 		emitter.emit("/");
-	}
-
-	public function testBasePathWithInitialFire() {
-		var emitter = new TestRouteEmitter();
-		var router = new Routly(emitter);
-
-		router.routes([
-		  "/" => function(?descriptor : RouteDescriptor) {
-		  	Assert.isTrue(true);
-		  }	
-		]);
-
-		router.listen();
 	}
 
 	public function testPathWithNoArguments() {
@@ -74,6 +74,7 @@ class TestNodeJs {
 		]);
 
 		router.listen(false);
-		emitter.emit("/test/1/foo/2/bar/3");
+		emitter.emit("/test/123/foo/456/bar/789");
 	}
+
 }
