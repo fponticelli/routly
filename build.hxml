@@ -1,0 +1,12 @@
+-cp src 
+-cp test
+-js bin/app.js
+-lib doom
+-lib lies
+-lib dots
+-lib thx.promise
+-lib thx.core
+-lib utest
+-main Test
+
+-cmd node bin/app.js
