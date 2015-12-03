@@ -5,7 +5,7 @@ class TestNodeJs {
 
 	public function testBasePath() {
 		var emitter = new TestRouteEmitter();
-		var router = new Routely(emitter);
+		var router = new Routly(emitter);
 
 		router.routes([
 		  "/" => function(/* path : RouteDescriptor */) {

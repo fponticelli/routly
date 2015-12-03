@@ -3,7 +3,7 @@ import js.Browser.*;
 import js.html.HashChangeEvent;
 
 class HtmlRouteEmitter implements IRouteEmitter {
-  public var subscribers = new Array<Routely>();
+  public var subscribers = new Array<Routly>();
 
   public function new() {
 
@@ -44,7 +44,7 @@ class HtmlRouteEmitter implements IRouteEmitter {
   }
 
   // add subscribers, which are routers
-  public function subscribe(router : Routely) {
+  public function subscribe(router : Routly) {
     subscribers.push(router);
   }
 

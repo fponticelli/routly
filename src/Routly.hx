@@ -2,7 +2,7 @@
 import js.Browser.*;
 import js.html.HashChangeEvent;
 
-class Routely {
+class Routly {
 
 	var mappings : Map<String, Void -> Void>;
 	var emitter : IRouteEmitter;

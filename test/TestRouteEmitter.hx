@@ -1,7 +1,7 @@
 import js.html.HashChangeEvent;
 
 class TestRouteEmitter implements IRouteEmitter {
-  public var subscribers : Array<Routely>;
+  public var subscribers : Array<Routly>;
 
   public function new() {}
 
@@ -16,8 +16,8 @@ class TestRouteEmitter implements IRouteEmitter {
     }
   }
 
-  public function subscribe(router : Routely) {
-    if (subscribers == null) subscribers = new Array<Routely>();
+  public function subscribe(router : Routly) {
+    if (subscribers == null) subscribers = new Array<Routly>();
 
     subscribers.push(router);
   }
