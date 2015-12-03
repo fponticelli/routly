@@ -5,6 +5,6 @@ import js.html.HashChangeEvent;
 ///
 interface IRouteEmitter {
 	public var subscribers : Array<Routely>;
-	public function emit(path : String) : Void;
+	public function emit(?path : String) : Void;
 	public function subscribe(router : Routely) : Void;
 }

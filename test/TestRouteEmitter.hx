@@ -5,7 +5,12 @@ class TestRouteEmitter implements IRouteEmitter {
 
   public function new() {}
 
-  public function emit(path : String) {
+  public function emit(?path : String) {
+
+    if (path == null) {
+      path = "/";
+    }
+
     for(subscriber in subscribers) {
       subscriber.fire(path);
     }

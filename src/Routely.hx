@@ -5,19 +5,20 @@ import js.html.HashChangeEvent;
 class Routely {
 
 	var mappings : Map<String, Void -> Void>;
+	var emitter : IRouteEmitter;
 
-	public function new(?dispatcher : IRouteEmitter) {
-		// if no dispatcher is passed in, we default to using
+	public function new(?_emitter : IRouteEmitter) {
+		
+		// if no IRouteEmitter is passed in, we default to using
 		// an HtmlRouteEmitter, which simply wraps window.onhashchange
-		if (dispatcher == null) 
-			dispatcher = new HtmlRouteEmitter();
+		if (_emitter == null) 
+			_emitter = new HtmlRouteEmitter();
 
-		// our router subscribes to the dispatcher
-		// which calls the router's fire method upon route changes
-		dispatcher.subscribe(this);
+		// keep track of our emitter
+		emitter = _emitter;
 	}
 
-	public function map(_mappings : Map<String, Void -> Void>) {
+	public function routes(_mappings : Map<String, Void -> Void>) {
 		if (mappings == null) 
 			mappings = new Map<String, Void -> Void>();
 
@@ -26,14 +27,25 @@ class Routely {
 	}
 
 	public function fire(path : String) {
-		trace("in Routely.fire() for path: " + path);
-
+		
 		// if route does not exist, maybe display a 404 view?
 		if (!mappings.exists(path)) 
 			return;
 
-		// the meat: invoke the callback associated with the matched route
+		// invoke the callback associated with the matched route
 		mappings.get(path)(/* RouteDescriptor */);
+	}
+
+	public function listen(fireEventForCurrentPath = true) {
+		// to listen for changes,
+		// subscribe the router subscribes to the emitter
+		// which calls the router's fire method upon route changes
+		emitter.subscribe(this);
+
+		// if we want to fire based on the current route (i.e., on page load),
+		// just tell our emitter to fire whatever the current hash is
+		if (fireEventForCurrentPath) 
+			emitter.emit();
 	}
 }
 

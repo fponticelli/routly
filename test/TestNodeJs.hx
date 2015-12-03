@@ -7,13 +7,14 @@ class TestNodeJs {
 		var emitter = new TestRouteEmitter();
 		var router = new Routely(emitter);
 
-		router.map([
+		router.routes([
 		  "/" => function(/* path : RouteDescriptor */) {
 		  	Assert.isTrue(true);
 		  }	
 		]);
 
-		//emitter.emitTo(router);	// emitTo may be better name
+		router.listen();
+
 		emitter.emit("/");
 	}
 
