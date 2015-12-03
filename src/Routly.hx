@@ -4,7 +4,7 @@ import js.html.HashChangeEvent;
 
 class Routly {
 
-	var mappings : Map<String, Void -> Void>;
+	var mappings : Map<String, ?RouteDescriptor -> Void>;
 	var emitter : IRouteEmitter;
 
 	public function new(?_emitter : IRouteEmitter) {
@@ -18,9 +18,9 @@ class Routly {
 		emitter = _emitter;
 	}
 
-	public function routes(_mappings : Map<String, Void -> Void>) {
+	public function routes(_mappings : Map<String, ?RouteDescriptor -> Void>) {
 		if (mappings == null) 
-			mappings = new Map<String, Void -> Void>();
+			mappings = new Map<String, ?RouteDescriptor -> Void>();
 
 		// assign the passed-in map to private var
 		mappings = _mappings;
@@ -28,17 +28,23 @@ class Routly {
 
 	public function fire(path : String) {
 		
-		// if route does not exist, maybe display a 404 view?
-		if (!mappings.exists(path)) 
+		// if route does not exist, 
+		// maybe display a 404 view?
+		var match = findMatch(path);
+		if (match == null) {
+			// call some "unknown/bad path" callback
 			return;
+		}
+
+		// build a description of the raw path that we have matched
+		var descriptor = parse(path);
 
 		// invoke the callback associated with the matched route
-		mappings.get(path)(/* RouteDescriptor */);
+		mappings.get(match)(descriptor);
 	}
 
 	public function listen(fireEventForCurrentPath = true) {
-		// to listen for changes,
-		// subscribe the router subscribes to the emitter
+		// to listen for changes, subscribe the router to the emitter,
 		// which calls the router's fire method upon route changes
 		emitter.subscribe(this);
 
@@ -46,6 +52,57 @@ class Routly {
 		// just tell our emitter to fire whatever the current hash is
 		if (fireEventForCurrentPath) 
 			emitter.emit();
+	}
+
+	private function findMatch(path : String) : String {
+
+		// check each registered route for a match against 
+		// the raw path, return the matching key if one is found
+		for(virtualPath in mappings.keys()) {
+			if (matches(path, virtualPath)) {
+				return virtualPath;
+			}
+		}
+
+		return null;
+	}
+
+	private function matches (rawPath : String, virtualPath : String) : Bool {
+
+		// compare the raw route with the parameterized route
+		// "/test/:id" becomes ["test", ":id"]
+		var routeSplit = virtualPath.split("/");
+		if (routeSplit == null || routeSplit.length == 0)
+			throw "we have registered an empty route apparently?";
+
+		// split up the raw route, e.g., "/test/1" becomes ["test", "1"]
+		var rawSplit = rawPath.split("/");
+		if (rawSplit == null || rawSplit.length == 0) 
+			throw "bad path, where are the slashes?! : " + rawPath;
+
+		// simple check against lengths, which must be equal to match
+		if (routeSplit.length != rawSplit.length) return false;
+
+		// since the lengths match, we now must walk the path and check that 
+		// each part is equal OR the raw part begins with a colon
+		for(i in 0...rawSplit.length) {
+			if (routeSplit[i].charAt(0) != ":" && routeSplit[i] != rawSplit[i])
+				continue;
+
+			// if this is the last part of the path, we've found a match!
+			if (i == routeSplit.length - 1) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	private function parse(path : String) : RouteDescriptor {
+		var descriptor = new RouteDescriptor(path);
+		descriptor.path = path;
+		descriptor.arguments = null;
+		return descriptor;
 	}
 }
 

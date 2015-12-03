@@ -3,33 +3,77 @@ import utest.Assert;
 class TestNodeJs {
 	public function new () {}
 
-	public function testBasePath() {
+	public function testBasePathWithoutInitialFire() {
 		var emitter = new TestRouteEmitter();
 		var router = new Routly(emitter);
 
 		router.routes([
-		  "/" => function(/* path : RouteDescriptor */) {
+		  "/" => function(?descriptor : RouteDescriptor) {
+		  	Assert.isTrue(true);
+		  }	
+		]);
+
+		// pass false because the router assumes we want it to initiate 
+		// a hashchangeevent when it starts listening (this is desired in the browser).
+		// otherwise, the assert will be called twice
+		router.listen(false);
+
+		// force our emitter to emit
+		emitter.emit("/");
+	}
+
+	public function testBasePathWithInitialFire() {
+		var emitter = new TestRouteEmitter();
+		var router = new Routly(emitter);
+
+		router.routes([
+		  "/" => function(?descriptor : RouteDescriptor) {
 		  	Assert.isTrue(true);
 		  }	
 		]);
 
 		router.listen();
-
-		emitter.emit("/");
 	}
 
-	// public function testTestPath() {
-	// 	var router = new Routely();
+	public function testPathWithNoArguments() {
+		var emitter = new TestRouteEmitter();
+		var router = new Routly(emitter);
 
-	// 	router.map([
-	// 	  "/test" => function(/* path : RouteDescriptor */) {
-	// 	    trace("test path!");
-	// 	  }	
-	// 	]);
+		router.routes([
+		  "/test" => function(?descriptor : RouteDescriptor) {
+		  	Assert.isTrue(true);
+		  }	
+		]);
 
-	// 	var testEmitter = new TestEmitter();
+		router.listen(false);
+		emitter.emit("/test");
+	}
 
-	// 	testEmitter.subscribe(router);	// emitTo may be better name
-	// 	testEmitter.emit("/test");
-	// }
+	public function testPathMatchesWithOneArgument() {
+		var emitter = new TestRouteEmitter();
+		var router = new Routly(emitter);
+
+		router.routes([
+		  "/test/:id" => function(?descriptor : RouteDescriptor) {
+		  	Assert.isTrue(true);
+		  }	
+		]);
+
+		router.listen(false);
+		emitter.emit("/test/1");
+	}
+
+	public function testPathMatchesWithMultipleArguments() {
+		var emitter = new TestRouteEmitter();
+		var router = new Routly(emitter);
+
+		router.routes([
+		  "/test/:id1/foo/:id2/bar/:id3" => function(?descriptor : RouteDescriptor) {
+		  	Assert.isTrue(true);
+		  }	
+		]);
+
+		router.listen(false);
+		emitter.emit("/test/1/foo/2/bar/3");
+	}
 }
