@@ -27,7 +27,11 @@ class Routly {
   }
 
   public function fire(path : String) {
-    
+
+    // WART
+    if (path == null || path == "")
+      path = "/";
+
     // if route does not exist, 
     // maybe display a 404 view?
     var descriptor = findMatch(path);
@@ -70,7 +74,6 @@ class Routly {
   }
 
   private function matches (rawPath : String, virtualPath : String) : RouteDescriptor {
-    trace("in matches: " + rawPath);
 
     // we want to strip everything after the question mark
     var questionMarkIndex = rawPath.lastIndexOf("?");
@@ -126,7 +129,7 @@ class Routly {
   private function parseQueryString(rawPath : String) : Map<String, String> {
     if (rawPath == null) 
       throw "Invalid url passed to parseQueryString: " + rawPath;
-    
+
     var results = new Map<String, String>();
 
     // strip everything to to the left of (and including) the question mark

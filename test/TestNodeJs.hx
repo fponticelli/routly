@@ -105,7 +105,7 @@ class TestNodeJs {
     emitter.emit("/test/123/foo/456/bar/789?hello=world");
   }
 
-  public function testQueryStringOneMultipleKVPs() {
+  public function testQueryStringMultipleKVPs() {
     var emitter = new TestRouteEmitter();
     var router = new Routly(emitter);
 
@@ -127,13 +127,60 @@ class TestNodeJs {
 
     router.routes([
       "/test/:id1/foo/:id2/bar/:id3" => function(?descriptor : RouteDescriptor) {
-        Assert.equals(descriptor.query.get("hello"), "world");
-        Assert.equals(descriptor.query.get("foo"), "bar");
-        Assert.equals(descriptor.query.get("x"), "y");
+        Assert.isTrue(descriptor.query.exists("flag"));
       }
     ]);
 
     router.listen(false);
-    emitter.emit("/test/123/foo/456/bar/789?hello=world&foo=bar&x=y");
+    emitter.emit("/test/123/foo/456/bar/789?flag");
+  }
+
+  public function testQueryStringMultipleFlags() {
+    var emitter = new TestRouteEmitter();
+    var router = new Routly(emitter);
+
+    router.routes([
+      "/test/:id1/foo/:id2/bar/:id3" => function(?descriptor : RouteDescriptor) {
+        Assert.isTrue(descriptor.query.exists("flagX"));
+        Assert.isTrue(descriptor.query.exists("flagY"));
+        Assert.isTrue(descriptor.query.exists("flagZ"));
+      }
+    ]);
+
+    router.listen(false);
+    emitter.emit("/test/123/foo/456/bar/789?flagX&flagY&flagZ");
+  }
+
+  public function testQueryStringMixingKVPsAndFlags() {
+    var emitter = new TestRouteEmitter();
+    var router = new Routly(emitter);
+
+    router.routes([
+      "/test/:id1/foo/:id2/bar/:id3" => function(?descriptor : RouteDescriptor) {
+        Assert.isTrue(descriptor.query.exists("flagX"));
+        Assert.isTrue(descriptor.query.exists("flagY"));
+        Assert.isTrue(descriptor.query.exists("flagZ"));
+        Assert.equals(descriptor.query.get("foo"), "bar");
+        Assert.equals(descriptor.query.get("hello"), "world");
+        Assert.equals(descriptor.query.get("one"), "two");
+      }
+    ]);
+
+    router.listen(false);
+    emitter.emit("/test/123/foo/456/bar/789?foo=bar&flagX&hello=world&flagY&one=two&flagZ");
+  }
+
+  public function testEmptyPath() {
+    var emitter = new TestRouteEmitter();
+    var router = new Routly(emitter);
+
+    router.routes([
+      "/" => function(?descriptor : RouteDescriptor) {
+        Assert.isTrue(true);
+      }
+    ]);
+
+    router.listen(false);
+    emitter.emit("");
   }
 }
