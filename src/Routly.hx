@@ -94,6 +94,7 @@ class Routly {
       // if this is the last part of the path, we've found a match!
       if (i == routeSplit.length - 1) {
         var arguments = parseArguments(rawSplit, routeSplit);
+        trace(arguments);
         return new RouteDescriptor(rawPath, virtualPath, arguments);
       }
     }
@@ -104,15 +105,15 @@ class Routly {
 
   // takes in the split virtual and raw paths and returns an array of IDs
   // i.e., raw path /test/123/foo/456/bar/789 will return ["123", "456", "789"]
-  private function parseArguments(raw : Array<String>, virtual : Array<String>) : Array<String> {
+  private function parseArguments(raw : Array<String>, virtual : Array<String>) : Map<String, String> {
 
     if (raw == null || virtual == null || raw.length != virtual.length)
       throw "invalid arrays passed to buildDescriptor.  must be non-null and equal length.";
 
-    var arguments = new Array<String>();
+    var arguments = new Map<String, String>();
     for(i in 0...raw.length) 
       if (virtual[i].charAt(0) == ":") 
-        arguments.push(raw[i]);
+        arguments.set(virtual[i].substring(1), raw[i]);
 
     return arguments;
   }

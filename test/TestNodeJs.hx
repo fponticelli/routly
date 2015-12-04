@@ -69,8 +69,8 @@ class TestNodeJs {
 
     router.routes([
       "/test/:id1/foo/:id2/bar/:id3" => function(?descriptor : RouteDescriptor) {
-        Assert.isTrue(true);
-      }  
+        Assert.equals(descriptor.arguments.get("id1"), "123");
+      }
     ]);
 
     router.listen(false);
