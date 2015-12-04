@@ -77,4 +77,63 @@ class TestNodeJs {
     emitter.emit("/test/123/foo/456/bar/789");
   }
 
+  public function testBasePathQueryStringOneKVP() {
+    var emitter = new TestRouteEmitter();
+    var router = new Routly(emitter);
+
+    router.routes([
+      "/" => function(?descriptor : RouteDescriptor) {
+        Assert.equals(descriptor.query.get("hello"), "world");
+      }
+    ]);
+
+    router.listen(false);
+    emitter.emit("/?hello=world");
+  }
+
+  public function testQueryStringOneKVP() {
+    var emitter = new TestRouteEmitter();
+    var router = new Routly(emitter);
+
+    router.routes([
+      "/test/:id1/foo/:id2/bar/:id3" => function(?descriptor : RouteDescriptor) {
+        Assert.equals(descriptor.query.get("hello"), "world");
+      }
+    ]);
+
+    router.listen(false);
+    emitter.emit("/test/123/foo/456/bar/789?hello=world");
+  }
+
+  public function testQueryStringOneMultipleKVPs() {
+    var emitter = new TestRouteEmitter();
+    var router = new Routly(emitter);
+
+    router.routes([
+      "/test/:id1/foo/:id2/bar/:id3" => function(?descriptor : RouteDescriptor) {
+        Assert.equals(descriptor.query.get("hello"), "world");
+        Assert.equals(descriptor.query.get("foo"), "bar");
+        Assert.equals(descriptor.query.get("x"), "y");
+      }
+    ]);
+
+    router.listen(false);
+    emitter.emit("/test/123/foo/456/bar/789?hello=world&foo=bar&x=y");
+  }
+
+  public function testQueryStringOneFlag() {
+    var emitter = new TestRouteEmitter();
+    var router = new Routly(emitter);
+
+    router.routes([
+      "/test/:id1/foo/:id2/bar/:id3" => function(?descriptor : RouteDescriptor) {
+        Assert.equals(descriptor.query.get("hello"), "world");
+        Assert.equals(descriptor.query.get("foo"), "bar");
+        Assert.equals(descriptor.query.get("x"), "y");
+      }
+    ]);
+
+    router.listen(false);
+    emitter.emit("/test/123/foo/456/bar/789?hello=world&foo=bar&x=y");
+  }
 }

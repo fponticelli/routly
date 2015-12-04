@@ -70,6 +70,11 @@ class Routly {
   }
 
   private function matches (rawPath : String, virtualPath : String) : RouteDescriptor {
+    trace("in matches: " + rawPath);
+
+    // we want to strip everything after the question mark
+    var questionMarkIndex = rawPath.lastIndexOf("?");
+    var formatted = if (questionMarkIndex > 0) rawPath.substring(0, questionMarkIndex) else rawPath;
 
     // compare the raw route with the parameterized route
     // "/test/:id" becomes ["test", ":id"]
@@ -78,9 +83,9 @@ class Routly {
       throw "we have registered an empty route apparently?";
 
     // split up the raw route, e.g., "/test/1" becomes ["test", "1"]
-    var rawSplit = rawPath.split("/");
+    var rawSplit = formatted.split("/");
     if (rawSplit == null || rawSplit.length == 0) 
-      throw "bad path, where are the slashes?! : " + rawPath;
+      throw "bad path, where are the slashes?! : " + formatted;
 
     // simple check against lengths, which must be equal to match
     if (routeSplit.length != rawSplit.length) return null;
@@ -93,9 +98,9 @@ class Routly {
 
       // if this is the last part of the path, we've found a match!
       if (i == routeSplit.length - 1) {
-        var arguments = parseArguments(rawSplit, routeSplit);
-        trace(arguments);
-        return new RouteDescriptor(rawPath, virtualPath, arguments);
+        var argumentsMap = parseArguments(rawSplit, routeSplit);
+        var queryMap = parseQueryString(rawPath);
+        return new RouteDescriptor(rawPath, virtualPath, argumentsMap, queryMap);
       }
     }
 
@@ -117,6 +122,32 @@ class Routly {
 
     return arguments;
   }
+
+  private function parseQueryString(rawPath : String) : Map<String, String> {
+    if (rawPath == null) 
+      throw "Invalid url passed to parseQueryString: " + rawPath;
+    
+    var results = new Map<String, String>();
+
+    // strip everything to to the left of (and including) the question mark
+    var startIndex = rawPath.lastIndexOf("?");
+    if (startIndex > -1) {
+
+      // split into key-values separate by ampersands
+      var pairs = rawPath.substring(startIndex + 1).split("&");
+
+      // build our dictionary
+      for(pair in pairs) {
+        var split = pair.split("=");
+
+        // simply add each pair to the dictionary
+        if (split.length == 2) 
+          results.set(split[0], split[1]);
+        else  // or if it is merely a flag, use the empty string
+          results.set(split[0], "");
+      }
+    }
+
+    return results;
+  }
 }
-
-
