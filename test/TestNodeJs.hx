@@ -10,7 +10,7 @@ class TestNodeJs {
     router.routes([
       "/" => function(?descriptor : RouteDescriptor) {
         Assert.isTrue(true);
-      }  
+      }
     ]);
 
     router.listen();
@@ -23,10 +23,10 @@ class TestNodeJs {
     router.routes([
       "/" => function(?descriptor : RouteDescriptor) {
         Assert.isTrue(true);
-      }  
+      }
     ]);
 
-    // pass false because the router assumes we want it to initiate 
+    // pass false because the router assumes we want it to initiate
     // a hashchangeevent when it starts listening (this is desired in the browser).
     // otherwise, the assert will be called twice
     router.listen(false);
@@ -42,7 +42,7 @@ class TestNodeJs {
     router.routes([
       "/test" => function(?descriptor : RouteDescriptor) {
         Assert.isTrue(true);
-      }  
+      }
     ]);
 
     router.listen(false);
@@ -56,7 +56,7 @@ class TestNodeJs {
     router.routes([
       "/test/:id" => function(?descriptor : RouteDescriptor) {
         Assert.isTrue(true);
-      }  
+      }
     ]);
 
     router.listen(false);
@@ -195,11 +195,27 @@ class TestNodeJs {
     ]);
 
     router.unknown(function(?descriptor : RouteDescriptor) {
-      trace(descriptor.raw);
       Assert.isTrue(true);
     });
 
     router.listen(false);
     emitter.emit("/nonexistent");
+  }
+
+  public function testSimilarPaths() {
+    var emitter = new TestRouteEmitter();
+    var router = new Routly(emitter);
+
+    router.routes([
+      "/foo/test" => function(?descriptor : RouteDescriptor) { },
+      "/test/foo" => function(?descriptor : RouteDescriptor) { },
+      "/test" => function(?descriptor : RouteDescriptor) { },
+      "/foo" => function(?descriptor : RouteDescriptor) {
+        Assert.isTrue(true);
+      }
+    ]);
+
+    router.listen(false);
+    emitter.emit("/foo");
   }
 }

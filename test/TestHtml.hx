@@ -11,7 +11,7 @@ class TestHtml {
     router.routes([
       "/" => function(?_) {
         Assert.isTrue(true);
-      }  
+      }
     ]);
 
     router.listen(false);

@@ -7,7 +7,7 @@ class HtmlRouteEmitter implements IRouteEmitter {
 
   public function new() {
 
-    // wrap the browser's window.onhashchange, which fires a 
+    // wrap the browser's window.onhashchange, which fires a
     // js.html.HashChangeEvent, which must be converted to a regular
     // string representing the new hash-path.  E.g., if the url is changed
     // to http://blah.com/#/test, then emit will be called with path "/test"
@@ -36,7 +36,7 @@ class HtmlRouteEmitter implements IRouteEmitter {
       path = path.substring(1);
     }
 
-    // to emit, we must call .fire() on 
+    // to emit, we must call .fire() on
     // all our subscribers, passing in the path
     for(subscriber in subscribers) {
       subscriber.fire(path);
@@ -48,7 +48,7 @@ class HtmlRouteEmitter implements IRouteEmitter {
     subscribers.push(router);
   }
 
-  // helper method: takes a HashChangeEvent 
+  // helper method: takes a HashChangeEvent
   // and returns the new hash path
   private function parsePath(hashChangeEvent : HashChangeEvent) {
     var split = hashChangeEvent.newURL.split("#");
