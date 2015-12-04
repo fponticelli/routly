@@ -3,6 +3,7 @@ import utest.Assert;
 class TestHtml {
   public function new () {}
 
+/*
   public function testBasePath() {
 
     var emitter = new TestRouteEmitter();
@@ -19,4 +20,5 @@ class TestHtml {
     emitter.emit("/");
 
   }
+*/
 }

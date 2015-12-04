@@ -4,7 +4,7 @@ import js.html.HashChangeEvent;
 
 class Routly {
 
-  var mappings : Map<String, ?RouteDescriptor -> Void>;
+  var mappings : Map<String, Dynamic>;
   var emitter : IRouteEmitter;
 
   public function new(?emitter : IRouteEmitter) {
@@ -18,9 +18,9 @@ class Routly {
     this.emitter = emitter;
   }
 
-  public function routes(mappings : Map<String, ?RouteDescriptor -> Void>) {
+  public function routes(mappings : Map<String, Dynamic>) {
     if (mappings == null) 
-      mappings = new Map<String, ?RouteDescriptor -> Void>();
+      mappings = new Map<String, Dynamic -> Void>();
 
     // assign the passed-in map to private var
     this.mappings = mappings;
@@ -39,7 +39,15 @@ class Routly {
 
     // invoke the callback associated with the descriptor of hte matched route
     var key = descriptor.virtual;
-    mappings.get(key)(descriptor);
+    var callback = mappings.get(descriptor.virtual);
+    
+    // we must cast each string argument to the type required by the callback's signature
+    var castedArguments = new Array<Dynamic>();
+    //var (for i 0...descriptor.arguments) {
+    //  var strArg = descriptor.arguments.get(i);
+    //}
+    Reflect.callMethod(this, callback, descriptor.arguments);
+    //mappings.get(key)(descriptor);
   }
 
   public function listen(fireEventForCurrentPath = true) {
@@ -94,7 +102,6 @@ class Routly {
       // if this is the last part of the path, we've found a match!
       if (i == routeSplit.length - 1) {
         var arguments = parseArguments(rawSplit, routeSplit);
-        trace(arguments);
         return new RouteDescriptor(rawPath, virtualPath, arguments);
       }
     }
@@ -105,15 +112,15 @@ class Routly {
 
   // takes in the split virtual and raw paths and returns an array of IDs
   // i.e., raw path /test/123/foo/456/bar/789 will return ["123", "456", "789"]
-  private function parseArguments(raw : Array<String>, virtual : Array<String>) : Map<String, String> {
+  private function parseArguments(raw : Array<String>, virtual : Array<String>) : Array<String> {
 
     if (raw == null || virtual == null || raw.length != virtual.length)
       throw "invalid arrays passed to buildDescriptor.  must be non-null and equal length.";
 
-    var arguments = new Map<String, String>();
+    var arguments = new Array<String>();
     for(i in 0...raw.length) 
       if (virtual[i].charAt(0) == ":") 
-        arguments.set(virtual[i].substring(1), raw[i]);
+        arguments.push(raw[i]);
 
     return arguments;
   }
