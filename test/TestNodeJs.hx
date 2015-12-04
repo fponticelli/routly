@@ -183,4 +183,23 @@ class TestNodeJs {
     router.listen(false);
     emitter.emit("");
   }
+
+  public function testUnknownPath() {
+    var emitter = new TestRouteEmitter();
+    var router = new Routly(emitter);
+
+    router.routes([
+      "/exists" => function(?descriptor : RouteDescriptor) {
+        Assert.isTrue(false); // we don't want this to get called
+      }
+    ]);
+
+    router.unknown(function(?descriptor : RouteDescriptor) {
+      trace(descriptor.raw);
+      Assert.isTrue(true);
+    });
+
+    router.listen(false);
+    emitter.emit("/nonexistent");
+  }
 }

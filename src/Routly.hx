@@ -5,6 +5,7 @@ import js.html.HashChangeEvent;
 class Routly {
 
   var mappings : Map<String, ?RouteDescriptor -> Void>;
+  var unknownPathCallback : ?RouteDescriptor -> Void;
   var emitter : IRouteEmitter;
 
   public function new(?emitter : IRouteEmitter) {
@@ -26,6 +27,10 @@ class Routly {
     this.mappings = mappings;
   }
 
+  public function unknown(callback : ?RouteDescriptor -> Void) {
+    unknownPathCallback = callback;
+  }
+
   public function fire(path : String) {
 
     // WART
@@ -38,6 +43,7 @@ class Routly {
     if (descriptor == null) {
       // TODO: call some "unknown/bad path" callback:
       // callback404(new Descriptor404(path))
+      unknownPathCallback(new RouteDescriptor(path));
       return;
     }
 
