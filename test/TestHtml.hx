@@ -1,22 +1,22 @@
 import utest.Assert;
 
 class TestHtml {
-	public function new () {}
+  public function new () {}
 
-	public function testBasePath() {
+  public function testBasePath() {
 
-		var emitter = new TestRouteEmitter();
-		var router = new Routly(emitter);
+    var emitter = new TestRouteEmitter();
+    var router = new Routly(emitter);
 
-		router.routes([
-		  "/" => function(?_) {
-		  	Assert.isTrue(true);
-		  }	
-		]);
+    router.routes([
+      "/" => function(?_) {
+        Assert.isTrue(true);
+      }  
+    ]);
 
-		router.listen(false);
+    router.listen(false);
 
-		emitter.emit("/");
+    emitter.emit("/");
 
-	}
+  }
 }

@@ -4,7 +4,7 @@ import js.html.HashChangeEvent;
 /// Probably poorly named
 ///
 interface IRouteEmitter {
-	public var subscribers : Array<Routly>;
-	public function emit(?path : String) : Void;
-	public function subscribe(router : Routly) : Void;
+  public var subscribers : Array<Routly>;
+  public function emit(?path : String) : Void;
+  public function subscribe(router : Routly) : Void;
 }
