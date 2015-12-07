@@ -1,26 +1,30 @@
 
 import js.Browser.*;
 import js.html.HashChangeEvent;
+import haxe.Serializer;
+import haxe.rtti.Meta;
 
 class Routly {
 
-  var mappings : Map<String, Dynamic>;
+  var mappings : Map<String, RouteInfo>;
   var emitter : IRouteEmitter;
 
   public function new(?emitter : IRouteEmitter) {
-    
+    this.mappings = new Map<String, RouteInfo>();
+
     // if no IRouteEmitter is passed in, we default to using
     // an HtmlRouteEmitter, which simply wraps window.onhashchange
     if (emitter == null) 
       emitter = new HtmlRouteEmitter();
 
+
     // keep track of our emitter
     this.emitter = emitter;
   }
 
-  public function routes(mappings : Map<String, Dynamic>) {
+  public function routes(mappings : Map<String, RouteInfo>) {
     if (mappings == null) 
-      mappings = new Map<String, Dynamic -> Void>();
+      mappings = new Map<String, RouteInfo>();
 
     // assign the passed-in map to private var
     this.mappings = mappings;
@@ -37,17 +41,10 @@ class Routly {
       return;
     }
 
-    // invoke the callback associated with the descriptor of hte matched route
-    var key = descriptor.virtual;
-    var callback = mappings.get(descriptor.virtual);
-    
     // we must cast each string argument to the type required by the callback's signature
-    var castedArguments = new Array<Dynamic>();
-    //var (for i 0...descriptor.arguments) {
-    //  var strArg = descriptor.arguments.get(i);
-    //}
-    Reflect.callMethod(this, callback, descriptor.arguments);
-    //mappings.get(key)(descriptor);
+    var routeInfo = mappings.get(descriptor.virtual);
+    var castedArguments = castArgs(descriptor.arguments, routeInfo);
+    Reflect.callMethod(this, routeInfo.callback, castedArguments);
   }
 
   public function listen(fireEventForCurrentPath = true) {
@@ -112,18 +109,83 @@ class Routly {
 
   // takes in the split virtual and raw paths and returns an array of IDs
   // i.e., raw path /test/123/foo/456/bar/789 will return ["123", "456", "789"]
-  private function parseArguments(raw : Array<String>, virtual : Array<String>) : Array<String> {
+  private function parseArguments(raw : Array<String>, virtual : Array<String>) : Map<String, String> {
 
     if (raw == null || virtual == null || raw.length != virtual.length)
       throw "invalid arrays passed to buildDescriptor.  must be non-null and equal length.";
 
-    var arguments = new Array<String>();
+    var arguments = new Map<String, String>();
     for(i in 0...raw.length) 
       if (virtual[i].charAt(0) == ":") 
-        arguments.push(raw[i]);
+        arguments.set(virtual[i].substring(1), raw[i]);
 
     return arguments;
   }
+
+  public function register(info : Class<Dynamic>) {
+
+    var routes = Type.getClassFields(info);
+    var staticMethodMeta = Meta.getStatics(info);
+
+    //  build a structure describing the shape of each route in the module
+    for(route in routes) {
+
+      // use reflection to get any metadata
+      var methodInfo = Reflect.field(staticMethodMeta, route);
+      var virtual = new String(methodInfo.route);
+      var arguments = parseArgNames(virtual);
+      var routeInfo = {
+        //virtual : virtual,
+        callback: Reflect.field(info, route),
+        arguments : new Map<String, String>()
+      };
+
+      // create a map of argument names to their types
+      for(name in arguments) {
+        var type = Reflect.field(methodInfo, name);
+        if (type == null) 
+          type = ["String"];
+
+        routeInfo.arguments.set(name, type[0]);
+      }
+
+      this.mappings.set(virtual, routeInfo);
+    }
+  }
+
+  function parseArgNames(virtualPath : String) : Array<String> {
+
+    var split = virtualPath.split("/");
+    if (split == null || split.length == 0)
+      throw "bad path, cannot parse arg names: " + virtualPath;
+
+    var results = new Array<String>();
+    for(part in split) 
+      if (part.charAt(0) == ":")
+        results.push(part.substring(1));
+
+    return results;
+  }
+
+  function castArgs(arguments : Map<String, String>, info : RouteInfo) : Array<Dynamic> {
+    var results = new Array<Dynamic>();
+    for(arg in arguments.keys()) {
+
+      switch (info.arguments.get(arg)) {
+        case "Int":
+          results.push(Std.parseInt(arguments.get(arg)));
+        case "String":
+          results.push(arguments.get(arg));
+
+      }
+    }
+
+    return results;
+  }
 }
 
-
+typedef RouteInfo = {
+  //virtual : String,
+  arguments : Map<String, String>,
+  callback: Dynamic
+};

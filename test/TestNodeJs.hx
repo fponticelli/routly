@@ -1,8 +1,10 @@
 import utest.Assert;
+import haxe.Serializer;
+import haxe.rtti.Meta;
 
 class TestNodeJs {
   public function new () {}
-
+/*
   public function testBasePathWithInitialFire() {
     var emitter = new TestRouteEmitter();
     var router = new Routly(emitter);
@@ -93,7 +95,7 @@ class TestNodeJs {
     var router = new Routly(emitter);
 
     router.routes([
-      "/:id/test/:key" => function(?id : Int, ?key : String) {
+      "/:id/test/:key" => function asdf(?id : Int, ?key : String) {
         Assert.equals(id, 2);
         Assert.equals(key, "helloWorld");
       }
@@ -102,23 +104,24 @@ class TestNodeJs {
     router.listen(false);
     emitter.emit("/2/test/helloWorld");
   }
+*/
+
+
 
   public function testIncorrectType() {
     var emitter = new TestRouteEmitter();
     var router = new Routly(emitter);
 
-    router.routes([
-      "/:id" => function(?id : Int) {
-        //trace("Why is this an Int?! > " + id);
-        Assert.isTrue(true);
-      }
-    ]);
+    // router.routes([
+    //   "users/:id/reset/:key" => TestRoutes.users_id_reset_key
+    // ]);
+
+    router.register(TestRoutes);
 
     router.listen(false);
-    emitter.emit("/helloWorld");
+    emitter.emit("/charts/2/test/fooview");
   }
-
-
+/*
   public function testDecimal() {
     var emitter = new TestRouteEmitter();
     var router = new Routly(emitter);
@@ -133,6 +136,14 @@ class TestNodeJs {
     router.listen(false);
     emitter.emit("/lat/27.83236462346/long/-7.473643234");
   }
+*/
+
+
+
+
+
+
+
 /*
 
   public function testBasePathWithInitialFire() {
@@ -223,4 +234,29 @@ class TestNodeJs {
     emitter.emit("/test/123/foo/456/bar/789");
   }
   */
+}
+
+class TestRoutes {
+
+  @route("/charts/:id/test/:view")
+  @id("Int")
+  //@view("String")
+  static public function charts_id_test_view(id : Int, view : String) {
+    //trace("in users_id_reset_key");
+    trace("in users_id_reset_key = " + (id + id));
+    Assert.isTrue(true);
+  }
+
+  @route("/users")
+  static public function users() {
+    //trace("in users_id_reset_key");
+    Assert.isTrue(true);
+  }
+
+  @route("/users/:id")
+  @id("Int")
+  static public function users_id(id : Int) {
+    //trace("in users_id_reset_key");
+    Assert.isTrue(true);
+  }
 }
