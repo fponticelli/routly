@@ -2,6 +2,7 @@ package routly;
 
 import js.Browser.*;
 import js.html.HashChangeEvent;
+using thx.Strings;
 
 class Routly {
 
@@ -88,12 +89,12 @@ class Routly {
 
     // compare the raw route with the parameterized route
     // "/test/:id" becomes ["test", ":id"]
-    var routeSplit = virtualPath.split("/");
+    var routeSplit = virtualPath.trimCharsLeft("/").split("/");
     if (routeSplit == null || routeSplit.length == 0)
       throw "we have registered an empty route apparently?";
 
     // split up the raw route, e.g., "/test/1" becomes ["test", "1"]
-    var rawSplit = formatted.split("/");
+    var rawSplit = formatted.trimCharsLeft("/").split("/");
     if (rawSplit == null || rawSplit.length == 0)
       throw "bad path, where are the slashes?! : " + formatted;
 
@@ -103,17 +104,17 @@ class Routly {
     // since the lengths match, we now must walk the path and check that
     // each part is equal OR the raw part begins with a colon
     // if we make it to the last part of the path, we've found a match!
-    for(i in 0...rawSplit.length)
-      if ((routeSplit[i].charAt(0) == ":" || routeSplit[i] == rawSplit[i]) && i == routeSplit.length - 1)
-        return new RouteDescriptor(
-          rawPath,
-          virtualPath,
-          parseArguments(rawSplit, routeSplit),
-          parseQueryString(rawPath)
-        );
-
-    // the raw path does NOT match the given virtual path
-    return null;
+    for(i in 0...rawSplit.length) {
+      if (routeSplit[i].charAt(0) != ":" && routeSplit[i] != rawSplit[i])
+        return null;
+    }
+    // the raw path does match the given virtual path
+    return new RouteDescriptor(
+      rawPath,
+      virtualPath,
+      parseArguments(rawSplit, routeSplit),
+      parseQueryString(rawPath)
+    );
   }
 
   // takes in the split virtual and raw paths and returns an array of IDs
