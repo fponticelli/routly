@@ -2,6 +2,7 @@
 -cp test
 -js bin/app.js
 -lib utest
+-lib thx.core
 -main Test
 
 -cmd node bin/app.js
