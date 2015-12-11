@@ -1,5 +1,5 @@
 import utest.UTest;
-import routely.*;
+import routly.*;
 
 class Test {
   static function main() {

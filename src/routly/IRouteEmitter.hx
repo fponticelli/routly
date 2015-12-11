@@ -1,3 +1,5 @@
+package routly;
+
 import js.html.HashChangeEvent;
 ///
 /// IRouteDispatcher wraps window.onhashchange, which allows to easier testing on the server.

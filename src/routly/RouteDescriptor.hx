@@ -1,3 +1,5 @@
+package routly;
+
 class RouteDescriptor {
 
   public var raw : String;
