@@ -5,8 +5,8 @@ import js.html.HashChangeEvent;
 
 class Routly {
 
-  var mappings : Map<String, ?RouteDescriptor -> Void>;
-  var unknownPathCallback : ?RouteDescriptor -> Void;
+  var mappings : Map<String, RouteDescriptor -> Void>;
+  var unknownPathCallback : RouteDescriptor -> Void;
   var emitter : IRouteEmitter;
 
   public function new(?emitter : IRouteEmitter) {
@@ -20,15 +20,15 @@ class Routly {
     this.emitter = emitter;
   }
 
-  public function routes(mappings : Map<String, ?RouteDescriptor -> Void>) {
+  public function routes(mappings : Map<String, RouteDescriptor -> Void>) {
     if (mappings == null)
-      mappings = new Map<String, ?RouteDescriptor -> Void>();
+      mappings = new Map<String, RouteDescriptor -> Void>();
 
     // assign the passed-in map to private var
     this.mappings = mappings;
   }
 
-  public function unknown(callback : ?RouteDescriptor -> Void) {
+  public function unknown(callback : RouteDescriptor -> Void) {
     unknownPathCallback = callback;
   }
 

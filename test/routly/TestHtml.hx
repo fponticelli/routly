@@ -11,7 +11,7 @@ class TestHtml {
     var router = new Routly(emitter);
 
     router.routes([
-      "/" => function(?_) {
+      "/" => function(_) {
         Assert.isTrue(true);
       }
     ]);
