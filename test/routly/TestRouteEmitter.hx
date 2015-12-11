@@ -1,3 +1,5 @@
+package routly;
+
 import js.html.HashChangeEvent;
 
 class TestRouteEmitter implements IRouteEmitter {

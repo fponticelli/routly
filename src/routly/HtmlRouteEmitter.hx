@@ -1,3 +1,5 @@
+package routly;
+
 import routely.*;
 import js.Browser.*;
 import js.html.HashChangeEvent;
