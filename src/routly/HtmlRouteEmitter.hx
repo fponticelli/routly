@@ -14,6 +14,10 @@ class HtmlRouteEmitter implements IRouteEmitter {
     // string representing the new hash-path.  E.g., if the url is changed
     // to http://blah.com/#/test, then emit will be called with path "/test"
     window.onhashchange = function(changeEvent : HashChangeEvent) {
+
+      // don't cause an infinite loop
+      if (changeEvent.newURL == changeEvent.oldURL) return;
+
       var path = parsePath(changeEvent);
       emit(path);
     }
