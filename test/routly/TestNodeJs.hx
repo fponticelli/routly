@@ -118,7 +118,7 @@ class TestNodeJs {
     ]);
 
     router.listen(false);
-    emitter.emit("/test/1");
+    emitter.emit("/test/~1");
   }
 
   public function testPathMatchesWithMultipleArguments() {
@@ -132,7 +132,7 @@ class TestNodeJs {
     ]);
 
     router.listen(false);
-    emitter.emit("/test/123/foo/456/bar/789");
+    emitter.emit("/test/~123/foo/~456/bar/~789");
   }
 
   public function testBasePathQueryStringOneKVP() {
@@ -160,7 +160,7 @@ class TestNodeJs {
     ]);
 
     router.listen(false);
-    emitter.emit("/test/123/foo/456/bar/789?hello=world");
+    emitter.emit("/test/~123/foo/~456/bar/~789?hello=world");
   }
 
   public function testQueryStringMultipleKVPs() {
@@ -176,7 +176,7 @@ class TestNodeJs {
     ]);
 
     router.listen(false);
-    emitter.emit("/test/123/foo/456/bar/789?hello=world&foo=bar&x=y");
+    emitter.emit("/test/~123/foo/~456/bar/~789?hello=world&foo=bar&x=y");
   }
 
   public function testQueryStringOneFlag() {
@@ -190,7 +190,7 @@ class TestNodeJs {
     ]);
 
     router.listen(false);
-    emitter.emit("/test/123/foo/456/bar/789?flag");
+    emitter.emit("/test/~123/foo/~456/bar/~789?flag");
   }
 
   public function testQueryStringMultipleFlags() {
@@ -206,7 +206,7 @@ class TestNodeJs {
     ]);
 
     router.listen(false);
-    emitter.emit("/test/123/foo/456/bar/789?flagX&flagY&flagZ");
+    emitter.emit("/test/~123/foo/~456/bar/~789?flagX&flagY&flagZ");
   }
 
   public function testQueryStringMixingKVPsAndFlags() {
@@ -225,7 +225,7 @@ class TestNodeJs {
     ]);
 
     router.listen(false);
-    emitter.emit("/test/123/foo/456/bar/789?foo=bar&flagX&hello=world&flagY&one=two&flagZ");
+    emitter.emit("/test/~123/foo/~456/bar/~789?foo=bar&flagX&hello=world&flagY&one=two&flagZ");
   }
 
   public function testEmptyPath() {

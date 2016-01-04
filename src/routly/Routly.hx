@@ -9,7 +9,6 @@ class Routly {
   var mappings : Map<String, RouteDescriptor -> Void>;
   var unknownPathCallback : RouteDescriptor -> Void;
   var emitter : IRouteEmitter;
-  private static var forbiddenIds = [ "create" ];
 
   public function new(?emitter : IRouteEmitter) {
 
@@ -106,13 +105,11 @@ class Routly {
     // each part is equal OR the raw part begins with a colon
     // if we make it to the last part of the path, we've found a match!
     for(i in 0...rawSplit.length) {
-      trace('comparing |${routeSplit[i]}| and |${rawSplit[i]}|');
-      if ((routeSplit[i].charAt(0) != ":" && routeSplit[i] != rawSplit[i])
-          || (routeSplit[i].charAt(0) == ":" && forbiddenIds.indexOf(rawSplit[i]) > -1))
+      if ((routeSplit[i].charAt(0) != ":" && routeSplit[i] != rawSplit[i]) ||
+          (routeSplit[i].charAt(0) == ":" && rawSplit[i].charAt(0) != "~"))
         return null;
     }
 
-    trace('matching |${rawPath}| to |${virtualPath}|');
     // the raw path does match the given virtual path
     return new RouteDescriptor(
       rawPath,
@@ -131,8 +128,10 @@ class Routly {
 
     var arguments = new Map<String, String>();
     for(i in 0...raw.length)
-      if (virtual[i].charAt(0) == ":")
-        arguments.set(virtual[i].substring(1), raw[i]);
+      if (virtual[i].charAt(0) == ":" && raw[i].charAt(0) != "~")
+        throw "route parameters must begin with ~";
+      else if (virtual[i].charAt(0) == ":")
+        arguments.set(virtual[i].substring(1), raw[i].substring(1));
 
     return arguments;
   }
