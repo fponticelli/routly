@@ -154,7 +154,7 @@ class Routly {
         var split = pair.split("=");
 
         // simply add each key-value-air or flag to the dictionary
-        results.set(split[0], if (split.length == 2) split[1] else "");
+        results.set(StringTools.urlDecode(split[0]), if (split.length == 2) StringTools.urlDecode(split[1]) else "");
       }
     }
 
