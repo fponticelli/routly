@@ -105,18 +105,21 @@ class Routly {
     // each part is equal OR the raw part begins with a colon
     // if we make it to the last part of the path, we've found a match!
     for(i in 0...rawSplit.length) {
+
+      // if this segment does not contain a :parameter,
+      // and the lengths are different, they do not match
+      if (routeSplit[i].indexOf(":") == -1 && rawSplit[i].length != routeSplit[i].length)
+        return null;
+
+      // walk down the segment, checking letter-by-letter
       for(j in 0...routeSplit[i].length) {
         if (rawSplit[i].charAt(j) != routeSplit[i].charAt(j) && routeSplit[i].charAt(j) != ":")
           return null;
         else if (routeSplit[i].charAt(j) != ":")
           break;
+
       }
     }
-
-
-    // users/~:id
-    // users/~abcd1234
-    // users/create
 
     // the raw path does match the given virtual path
     return new RouteDescriptor(

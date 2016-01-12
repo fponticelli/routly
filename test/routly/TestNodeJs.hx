@@ -5,6 +5,23 @@ import utest.Assert;
 class TestNodeJs {
   public function new () {}
 
+  public function testIssue20160112() {
+    var emitter = new TestRouteEmitter();
+    var router = new Routly(emitter);
+
+    router.routes([
+      "/" => function(?descriptor : RouteDescriptor) {
+        Assert.fail("path should not match");
+      },
+      "/users" => function(?descriptor : RouteDescriptor) {
+        Assert.pass("right path");
+      }
+    ]);
+
+    router.listen(false);
+    emitter.emit("/users");
+  }
+
   public function testIssue20151229() {
     var emitter = new TestRouteEmitter();
     var router = new Routly(emitter);
