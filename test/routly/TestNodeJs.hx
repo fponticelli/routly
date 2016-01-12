@@ -22,6 +22,24 @@ class TestNodeJs {
     emitter.emit("/users");
   }
 
+  public function testIssue20160112v2() {
+    var emitter = new TestRouteEmitter();
+    var router = new Routly(emitter);
+
+    router.routes([
+      "/" => function(?descriptor : RouteDescriptor) {
+        Assert.fail("path should not match");
+      },
+      "/~:id" => function(?descriptor : RouteDescriptor) {
+        Assert.pass("right path");
+        Assert.equals(descriptor.arguments.get("id"), "123");
+      }
+    ]);
+
+    router.listen(false);
+    emitter.emit("/~123");
+  }
+
   public function testIssue20151229() {
     var emitter = new TestRouteEmitter();
     var router = new Routly(emitter);
