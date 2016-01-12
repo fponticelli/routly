@@ -10,8 +10,8 @@ class TestNodeJs {
     var router = new Routly(emitter);
 
     router.routes([
-      "/users/:id" => function(?descriptor : RouteDescriptor) {
-        Assert.fail("path should not match");
+      "/users/~:id" => function(?descriptor : RouteDescriptor) {
+        Assert.fail("~:id path should not match");
       },
       "/users/create" => function(?descriptor : RouteDescriptor) {
         Assert.pass("right path");
@@ -20,17 +20,6 @@ class TestNodeJs {
 
     router.listen(false);
     emitter.emit("/users/create");
-
-    // router.routes([
-    //   "/users/:id" => function(?descriptor : RouteDescriptor) {
-    //     Assert.fail("path should not match");
-    //   },
-    //   "/users/create" => function(?descriptor : RouteDescriptor) {
-    //     Assert.pass("right path");
-    //   }
-    // ]);
-
-    // emitter.emit("/a/~123");
   }
 
   public function testIssue20151211() {
@@ -38,10 +27,10 @@ class TestNodeJs {
     var router = new Routly(emitter);
 
     router.routes([
-      "/a/:id" => function(?descriptor : RouteDescriptor) {
+      "/a/~:id" => function(?descriptor : RouteDescriptor) {
         Assert.fail("path should not match");
       },
-      "/b/:id" => function(?descriptor : RouteDescriptor) {
+      "/b/~:id" => function(?descriptor : RouteDescriptor) {
         Assert.pass("right path");
       }
     ]);
@@ -50,10 +39,10 @@ class TestNodeJs {
     emitter.emit("/b/~123");
 
     router.routes([
-      "/a/:id" => function(?descriptor : RouteDescriptor) {
+      "/a/~:id" => function(?descriptor : RouteDescriptor) {
         Assert.pass("right path");
       },
-      "/b/:id" => function(?descriptor : RouteDescriptor) {
+      "/b/~:id" => function(?descriptor : RouteDescriptor) {
         Assert.fail("path should not match");
       }
     ]);
@@ -112,7 +101,7 @@ class TestNodeJs {
     var router = new Routly(emitter);
 
     router.routes([
-      "/test/:id" => function(?descriptor : RouteDescriptor) {
+      "/test/~:id" => function(?descriptor : RouteDescriptor) {
         Assert.isTrue(true);
       }
     ]);
@@ -126,14 +115,17 @@ class TestNodeJs {
     var router = new Routly(emitter);
 
     router.routes([
-      "/test/:id1/foo/:id2/bar/:id3" => function(?descriptor : RouteDescriptor) {
+      "/test/~:id1/foo/~:id2/bar/~:id3" => function(?descriptor : RouteDescriptor) {
         Assert.equals(descriptor.arguments.get("id1"), "123");
+        Assert.equals(descriptor.arguments.get("id2"), "456");
+        Assert.equals(descriptor.arguments.get("id3"), "789");
       }
     ]);
 
     router.listen(false);
     emitter.emit("/test/~123/foo/~456/bar/~789");
   }
+
 
   public function testBasePathQueryStringOneKVP() {
     var emitter = new TestRouteEmitter();
@@ -154,7 +146,7 @@ class TestNodeJs {
     var router = new Routly(emitter);
 
     router.routes([
-      "/test/:id1/foo/:id2/bar/:id3" => function(?descriptor : RouteDescriptor) {
+      "/test/~:id1/foo/~:id2/bar/~:id3" => function(?descriptor : RouteDescriptor) {
         Assert.equals(descriptor.query.get("hello"), "world");
       }
     ]);
@@ -168,7 +160,7 @@ class TestNodeJs {
     var router = new Routly(emitter);
 
     router.routes([
-      "/test/:id1/foo/:id2/bar/:id3" => function(?descriptor : RouteDescriptor) {
+      "/test/~:id1/foo/~:id2/bar/~:id3" => function(?descriptor : RouteDescriptor) {
         Assert.equals(descriptor.query.get("hello"), "world");
         Assert.equals(descriptor.query.get("foo"), "bar");
         Assert.equals(descriptor.query.get("x"), "y");
@@ -184,7 +176,7 @@ class TestNodeJs {
     var router = new Routly(emitter);
 
     router.routes([
-      "/test/:id1/foo/:id2/bar/:id3" => function(?descriptor : RouteDescriptor) {
+      "/test/~:id1/foo/~:id2/bar/~:id3" => function(?descriptor : RouteDescriptor) {
         Assert.isTrue(descriptor.query.exists("flag"));
       }
     ]);
@@ -198,7 +190,7 @@ class TestNodeJs {
     var router = new Routly(emitter);
 
     router.routes([
-      "/test/:id1/foo/:id2/bar/:id3" => function(?descriptor : RouteDescriptor) {
+      "/test/~:id1/foo/~:id2/bar/~:id3" => function(?descriptor : RouteDescriptor) {
         Assert.isTrue(descriptor.query.exists("flagX"));
         Assert.isTrue(descriptor.query.exists("flagY"));
         Assert.isTrue(descriptor.query.exists("flagZ"));
@@ -214,7 +206,7 @@ class TestNodeJs {
     var router = new Routly(emitter);
 
     router.routes([
-      "/test/:id1/foo/:id2/bar/:id3" => function(?descriptor : RouteDescriptor) {
+      "/test/~:id1/foo/~:id2/bar/~:id3" => function(?descriptor : RouteDescriptor) {
         Assert.isTrue(descriptor.query.exists("flagX"));
         Assert.isTrue(descriptor.query.exists("flagY"));
         Assert.isTrue(descriptor.query.exists("flagZ"));
