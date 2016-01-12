@@ -45,7 +45,7 @@ class Routly {
     if (descriptor == null) {
       // TODO: call some "unknown/bad path" callback:
       // callback404(new Descriptor404(path))
-      unknownPathCallback(new RouteDescriptor(path));
+      if (unknownPathCallback != null) unknownPathCallback(new RouteDescriptor(path));
       return;
     }
 
@@ -105,10 +105,18 @@ class Routly {
     // each part is equal OR the raw part begins with a colon
     // if we make it to the last part of the path, we've found a match!
     for(i in 0...rawSplit.length) {
-      if ((routeSplit[i].charAt(0) != ":" && routeSplit[i] != rawSplit[i]) ||
-          (routeSplit[i].charAt(0) == ":" && rawSplit[i].charAt(0) != "~"))
-        return null;
+      for(j in 0...routeSplit[i].length) {
+        if (rawSplit[i].charAt(j) != routeSplit[i].charAt(j) && routeSplit[i].charAt(j) != ":")
+          return null;
+        else if (routeSplit[i].charAt(j) != ":")
+          break;
+      }
     }
+
+
+    // users/~:id
+    // users/~abcd1234
+    // users/create
 
     // the raw path does match the given virtual path
     return new RouteDescriptor(
@@ -127,11 +135,11 @@ class Routly {
       throw "invalid arrays passed to buildDescriptor.  must be non-null and equal length.";
 
     var arguments = new Map<String, String>();
-    for(i in 0...raw.length)
-      if (virtual[i].charAt(0) == ":" && raw[i].charAt(0) != "~")
-        throw "route parameters must begin with ~";
-      else if (virtual[i].charAt(0) == ":")
-        arguments.set(virtual[i].substring(1), raw[i].substring(1));
+    for(i in 0...raw.length) {
+      var colonIndex = virtual[i].indexOf(":");
+      if (colonIndex > -1)
+        arguments.set(virtual[i].substring(colonIndex + 1), raw[i].substring(1));
+    }
 
     return arguments;
   }
