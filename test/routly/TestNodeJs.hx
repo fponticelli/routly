@@ -40,6 +40,27 @@ class TestNodeJs {
     emitter.emit("/~123");
   }
 
+  public function testIssue20160113() {
+    var emitter = new TestRouteEmitter();
+    var router = new Routly(emitter);
+
+    router.routes([
+      "/orders" => function(?descriptor : RouteDescriptor) {
+        Assert.fail("path should not match");
+      },
+      "/orders/~:id" => function(?descriptor : RouteDescriptor) {
+        Assert.fail("path should not match");
+      },
+      "/orders/~:orderId/lines/~:lineId" => function(?descriptor : RouteDescriptor) {
+        Assert.equals(descriptor.arguments.get("orderId"), "P4NK3A");
+        Assert.equals(descriptor.arguments.get("lineId"), "df3914a1-e7a8-43bd-a457-6c644b77ba35");
+      }
+    ]);
+
+    router.listen(false);
+    emitter.emit("/orders/~P4NK3A/lines/~df3914a1-e7a8-43bd-a457-6c644b77ba35");
+  }
+
   public function testIssue20151229() {
     var emitter = new TestRouteEmitter();
     var router = new Routly(emitter);
