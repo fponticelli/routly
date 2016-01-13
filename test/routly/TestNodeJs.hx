@@ -5,6 +5,23 @@ import utest.Assert;
 class TestNodeJs {
   public function new () {}
 
+  public function testIssue20160113v2() {
+    var emitter = new TestRouteEmitter();
+    var router = new Routly(emitter);
+
+    router.routes([
+      "/products" => function(?descriptor : RouteDescriptor) {
+        Assert.fail("path should not match");
+      },
+      "/products/:slug" => function(?descriptor : RouteDescriptor) {
+        Assert.equals(descriptor.arguments.get("slug"), "fake-slug");
+      }
+    ]);
+
+    router.listen(false);
+    emitter.emit("/products/fake-slug");
+  }
+
   public function testIssue20160112() {
     var emitter = new TestRouteEmitter();
     var router = new Routly(emitter);
@@ -324,4 +341,5 @@ class TestNodeJs {
     router.listen(false);
     emitter.emit("/foo");
   }
+
 }

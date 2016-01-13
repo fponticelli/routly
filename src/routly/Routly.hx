@@ -98,27 +98,19 @@ class Routly {
     if (rawSplit == null || rawSplit.length == 0)
       throw "bad path, where are the slashes?! : " + formatted;
 
-    // simple check against lengths, which must be equal to match
+    // simple check against the # of segments, which must be equal
     if (routeSplit.length != rawSplit.length) return null;
 
     // since the lengths match, we now must walk the path and check that
-    // each part is equal OR the raw part begins with a colon
-    // if we make it to the last part of the path, we've found a match!
+    // each segment is identical OR the raw segment contains a colon (but the content of the segment BEFORE
+    // the colon must still match)
     for(i in 0...rawSplit.length) {
+      var colonIndex = routeSplit[i].indexOf(":");
+      var segmentMismatch = colonIndex == -1 && rawSplit[i] != routeSplit[i];
+      if (segmentMismatch) return null;
 
-      // if this segment does not contain a :parameter,
-      // and the lengths are different, they do not match
-      if (routeSplit[i].indexOf(":") == -1 && rawSplit[i].length != routeSplit[i].length)
-        return null;
-
-      // walk down the segment, checking letter-by-letter
-      for(j in 0...routeSplit[i].length) {
-        if (rawSplit[i].charAt(j) != routeSplit[i].charAt(j) && routeSplit[i].charAt(j) != ":")
-          return null;
-        else if (routeSplit[i].charAt(j) != ":")
-          break;
-
-      }
+      var argumentSegmentMismatch = colonIndex != -1 && rawSplit[i].substring(0, colonIndex) != routeSplit[i].substring(0, colonIndex);
+      if (argumentSegmentMismatch) return null;
     }
 
     // the raw path does match the given virtual path
@@ -141,7 +133,7 @@ class Routly {
     for(i in 0...raw.length) {
       var colonIndex = virtual[i].indexOf(":");
       if (colonIndex > -1)
-        arguments.set(virtual[i].substring(colonIndex + 1), raw[i].substring(1));
+        arguments.set(virtual[i].substring(colonIndex + 1), raw[i].substring(colonIndex));
     }
 
     return arguments;
